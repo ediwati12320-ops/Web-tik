@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PENILAIAN AKHIR SEMESTER - TIK</title>
+<style>
+body{font-family:'Roboto',Arial;background:#f1f3f4;margin:0;padding:20px}
+.box{max-width:650px;margin:20px auto;background:white;border-radius:8px;padding:0;box-shadow:0 1px 3px #ccc;overflow:hidden}
+.header{height:8px;background:#673ab7}
+.content{padding:24px}
+h1{font-size:28px;margin:0 0 8px;color:#202124}
+.desc{color:#5f6368;font-size:14px;margin-bottom:20px}
+.email-box{background:#f8f9fa;padding:12px;border-radius:5px;margin:15px 0;color:#5f6368;font-size:14px}
+.wajib{color:#d93025;font-size:13px;margin:15px 0}
+.form-group{background:white;border:1px solid #dadce0;border-radius:8px;padding:18px;margin:12px 0}
+.form-group label{font-size:15px;color:#202124;display:block;margin-bottom:8px}
+.form-group label span{color:#d93025}
+input{width:100%;border:none;border-bottom:1px solid #dadce0;padding:8px 0;font-size:16px;outline:none}
+input:focus{border-bottom:2px solid #673ab7}
+button{background:#673ab7;color:white;border:none;padding:10px 24px;border-radius:5px;font-size:14px;font-weight:500;cursor:pointer;margin-top:20px}
+button:hover{background:#5e35b1}
+.soal{margin:18px 0;padding:15px;border-left:4px solid #673ab7;background:#f8f9fa;border-radius:5px}
+label.option{display:block;margin:8px 0;cursor:pointer;font-size:15px}
+.panel-login{max-width:400px;margin:50px auto}
+table td,th{padding:8px;text-align:center;font-size:14px}
+h2{color:#673ab7}
+</style>
+</head>
+<body>
+<div class="box" id="loginBox">
+  <div class="header"></div>
+  <div class="content">
+    <h1>PENILAIAN AKHIR SEMESTER</h1>
+    <div class="desc">Soal Ujian Penilaian Akhir Semester TIK Kelas VII/VIII Semester Genap Tahun Pelajaran 2025/2026</div>
+    
+    <div class="email-box">avriavrin@gmail.com <a href="#" style="color:#1a73e8">Ganti akun</a><br>Tidak dibagikan</div>
+    
+    <div class="wajib">* Menunjukkan pertanyaan yang wajib diisi</div>
+
+    <div class="form-group">
+      <label>Nama <span>*</span></label>
+      <input type="text" id="nama" placeholder="Jawaban Anda">
+    </div>
+
+    <div class="form-group">
+      <label>Kelas <span>*</span></label>
+      <input type="text" id="kelas" placeholder="Jawaban Anda">
+    </div>
+
+    <div class="form-group">
+      <label>Nomor Peserta <span>*</span></label>
+      <input type="text" id="nop" placeholder="Jawaban Anda">
+    </div>
+
+    <div class="form-group">
+      <label>Token Ujian <span>*</span></label>
+      <input type="password" id="token" placeholder="Masukkan token dari guru">
+    </div>
+
+    <button onclick="cekLogin()">Mulai Ujian</button>
+  </div>
+</div>
+
+<div class="box" id="soalBox" style="display:none">
+  <div class="header"></div>
+  <div class="content">
+    <h2>Halo <span id="namaSiswa"></span></h2>
+    <p style="color:#5f6368">Kelas: <span id="kelasSiswa"></span> | No Peserta: <span id="nopSiswa"></span></p>
+    <div id="listSoal"></div>
+    <button onclick="kumpul()">Kumpulkan Jawaban</button>
+  </div>
+</div>
+
+<div class="box" id="hasilBox" style="display:none">
+  <div class="header"></div>
+  <div class="content">
+    <h2>Jawaban kamu sudah direkam</h2>
+    <p>Nama: <span id="hasilNama"></span></p>
+    <p>Kelas: <span id="hasilKelas"></span></p>
+    <p>No Peserta: <span id="hasilNop"></span></p>
+    <h3>Nilai: <span id="nilai"></span>/100</h3>
+    <p>Benar: <span id="benar"></span> dari 30 soal</p>
+  </div>
+</div>
+
+<script>
+const TOKEN_UJIAN = "coba 1";
+const PASSWORD_GURU = "avri1232";
+
+const soal = [
+  {q:"Berikut ini yang bukan merupakan peramban internet (web browser) adalah...", a:["Google Chrome","Mozilla Firefox","Opera","Microsoft Excel","Safari"], benar:3},
+  {q:"Fungsi untuk mencari nilai rata-rata dari sekumpulan data adalah...", a:["SUM","AVERAGE","MAX","MIN","IF"], benar:1},
+  {q:"Program aplikasi dari Microsoft Office yang digunakan untuk pengolahan angka dan data tabel adalah...", a:["Microsoft Word","Microsoft Excel","Microsoft PowerPoint","Microsoft Access","Microsoft Publisher"], benar:1},
+  {q:"Otak komputer yang berfungsi untuk memproses data disebut...", a:["RAM","HDD","CPU","Monitor","Keyboard"], benar:2},
+  {q:"Perangkat keras untuk menampilkan hasil proses komputer disebut...", a:["Printer","Monitor","Speaker","Scanner","Mouse"], benar:1},
+  {q:"Ekstensi file untuk Microsoft Word adalah...", a:[".xlsx",".pptx",".docx",".jpg",".pdf"], benar:2},
+  {q:"Tempat penyimpanan sementara saat komputer bekerja disebut...", a:["Harddisk","RAM","CD-ROM","Flashdisk","Processor"], benar:1},
+  {q:"Ctrl + C pada keyboard berfungsi untuk...", a:["Paste","Copy","Cut","Save","Undo"], benar:1},
+  {q:"Perangkat input yang digunakan untuk memasukkan data berupa tulisan adalah...", a:["Mouse","Printer","Keyboard","Scanner","Speaker"], benar:2},
+  {q:"Software yang mengatur semua program di komputer disebut...", a:["Aplikasi","Browser","Sistem Operasi","Antivirus","Driver"], benar:2},
+  {q:"Satuan terkecil dari data komputer adalah...", a:["Byte","Bit","KB","MB","GB"], benar:1},
+  {q:"1 Byte = ... Bit", a:["4","8","10","16","32"], benar:1},
+  {q:"Perangkat untuk mencetak dokumen dari komputer adalah...", a:["Scanner","Printer","Proyektor","Monitor","Plotter"], benar:1},
+  {q:"Contoh sistem operasi open source adalah...", a:["Windows","macOS","Linux","Android","iOS"], benar:2},
+  {q:"Fungsi F5 pada keyboard umumnya untuk...", a:["Save","Print","Refresh","Close","Search"], benar:2},
+  {q:"Alamat unik yang digunakan untuk mengidentifikasi komputer di jaringan disebut...", a:["URL","IP Address","Email","Domain","Password"], benar:1},
+  {q:"Virus komputer adalah...", a:["Hardware rusak","Program berbahaya","File kosong","Cache browser","Driver error"], benar:1},
+  {q:"Simbol @ pada email dibaca...", a:["At","And","To","In","For"], benar:0},
+  {q:"Perangkat untuk menyimpan data eksternal berukuran kecil disebut...", a:["Harddisk","Flashdisk","RAM","Processor","Motherboard"], benar:1},
+  {q:"Ctrl + V berfungsi untuk...", a:["Copy","Cut","Paste","Save","Select All"], benar:2},
+  {q:"Bagian komputer yang menghubungkan semua komponen disebut...", a:["CPU","RAM","Motherboard","Power Supply","VGA"], benar:2},
+  {q:"Ekstensi file presentasi PowerPoint adalah...", a:[".doc",".xls",".pptx",".png",".txt"], benar:2},
+  {q:"Perangkat output untuk menghasilkan suara adalah...", a:["Monitor","Printer","Speaker","Keyboard","Mouse"], benar:2},
+  {q:"Shortcut untuk menyimpan dokumen adalah...", a:["Ctrl+S","Ctrl+P","Ctrl+Z","Ctrl+X","Ctrl+F"], benar:0},
+  {q:"Jaringan komputer yang cakupannya dalam satu gedung disebut...", a:["WAN","MAN","LAN","Internet","Bluetooth"], benar:2},
+  {q:"Fungsi utama antivirus adalah...", a:["Mempercepat komputer","Menghapus file","Melindungi dari virus","Edit foto","Buka internet"], benar:2},
+  {q:"Tempat menyimpan file secara permanen di komputer adalah...", a:["RAM","Cache","Harddisk","Clipboard","Recycle Bin"], benar:2},
+  {q:"Browser buatan Google adalah...", a:["Bing","Yahoo","Chrome","DuckGo","Opera"], benar:2},
+  {q:"Perangkat untuk memasukkan gambar ke komputer disebut...", a:["Printer","Scanner","Plotter","Proyektor","Speaker"], benar:1},
+  {q:"Windows, Linux, macOS termasuk jenis...", a:["Aplikasi","Browser","Sistem Operasi","Database","Antivirus"], benar:2}
+];
+
+let nama, kelas, nop, jawaban = [];
+
+function cekLogin(){
+  let token = document.getElementById('token').value;
+  nama = document.getElementById('nama').value;
+  kelas = document.getElementById('kelas').value;
+  nop = document.getElementById('nop').value;
+  
+  if(token != TOKEN_UJIAN) return alert('Token salah! Minta token ke guru');
+  if(!nama ||!kelas ||!nop) return alert('Semua field wajib diisi');
+
+  document.getElementById('loginBox').style.display='none';
+  document.getElementById('soalBox').style.display='block';
+  document.getElementById('namaSiswa').innerText = nama;
+  document.getElementById('kelasSiswa').innerText = kelas;
+  document.getElementById('nopSiswa').innerText = nop;
+
+  let html = '';
+  soal.forEach((s,i)=>{
+    html += `<div class="soal"><b>${i+1}. ${s.q}</b><br>`;
+    s.a.forEach((opt,j)=>{
+      let huruf = String.fromCharCode(65+j);
+      html += `<label class="option"><input type="radio" name="s${i}" value="${j}"> ${huruf}. ${opt}</label>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('listSoal').innerHTML = html;
+}
+
+function kumpul(){
+  let benar = 0;
+  soal.forEach((s,i)=>{
+    let pilih = document.querySelector(`input[name="s${i}"]:checked`);
+    jawaban[i] = pilih? parseInt(pilih.value) : -1;
+    if(jawaban[i] == s.benar) benar++;
+  });
+
+  let nilai = Math.round((benar/soal.length)*100);
+
+  let data = JSON.parse(localStorage.getItem('nilaiTIK') || '[]');
+  data.push({nama,kelas,nop,nilai,benar,tanggal:new Date().toLocaleString(),jawaban});
+  localStorage.setItem('nilaiTIK', JSON.stringify(data));
+
+  document.getElementById('soalBox').style.display='none';
+  document.getElementById('hasilBox').style.display='block';
+  document.getElementById('hasilNama').innerText = nama;
+  document.getElementById('hasilKelas').innerText = kelas;
+  document.getElementById('hasilNop').innerText = nop;
+  document.getElementById('nilai').innerText = nilai;
+  document.getElementById('benar').innerText = benar;
+}
+
+if(window.location.search.includes('panel=')){
+  loginPanel();
+}
+
+function loginPanel(){
+  document.body.innerHTML = `<div class="box panel-login">
+    <div class="header"></div>
+    <div class="content">
+    <h2>Login Panel Guru</h2>
+    <div class="form-group"><input type="password" id="passGuru" placeholder="Password Guru"></div>
+    <button onclick="cekPassGuru()">Masuk Panel</button>
+    <br><a href="./">Kembali</a>
+    </div>
+  </div>`;
+}
+
+function cekPassGuru(){
+  let pass = document.getElementById('passGuru').value;
+  if(pass != PASSWORD_GURU) return alert('Password guru salah!');
+  bukaPanel();
+}
+
+function bukaPanel(){
+  let data = JSON.parse(localStorage.getItem('nilaiTIK') || '[]');
+  let html = `<h2>Panel Guru - Nilai TIK</h2>
+  <button onclick="hapusData()">Hapus Semua Data</button>
+  <table border="1" width="100%" style="margin-top:10px;border-collapse:collapse">
+  <tr style="background:#673ab7;color:white"><th>No</th><th>Nama</th><th>Kelas</th><th>No Peserta</th><th>Benar</th><th>Nilai</th><th>Waktu</th></tr>`;
+
+  data.forEach((d,i)=>{
+    html += `<tr><td>${i+1}</td><td>${d.nama}</td><td>${d.kelas}</td><td>${d.nop}</td><td>${d.benar}/30</td><td>${d.nilai}</td><td>${d.tanggal}</td></tr>`;
+  });
+  html += `</table><br><a href="./">Kembali</a>`;
+
+  document.body.innerHTML = `<div class="box">${html}</div>`;
+}
+
+function hapusData(){
+  if(confirm('Yakin hapus semua nilai?')) {
+    localStorage.removeItem('nilaiTIK');
+    location.reload();
+  }
+}
+</script>
+</body>
+</html>
